@@ -98,8 +98,19 @@ function drawConnections() {
     const connections = document.getElementById('connections');
     const container = document.getElementById('skillsContainer');
     const skills = skillManager.getAllSkills();
+    const legend = document.getElementById('connectionLegend');
     
     const containerRect = container.getBoundingClientRect();
+    
+    connections.innerHTML = '';
+    
+    // 只在网格视图且非移动端时显示连接线和图例
+    if (currentView !== 'grid' || window.innerWidth <= 768) {
+        if (legend) legend.style.display = 'none';
+        return;
+    }
+    
+    if (legend) legend.style.display = 'block';
     
     skills.forEach(skill => {
         skill.prerequisites.forEach(prereqId => {
@@ -115,16 +126,104 @@ function drawConnections() {
                 const x2 = skillRect.left - containerRect.left + skillRect.width / 2;
                 const y2 = skillRect.top - containerRect.top + skillRect.height / 2;
                 
+                // 计算连接线状态
+                const prereqStatus = skillManager.getSkillStatus(prereqId);
+                const skillStatus = skillManager.getSkillStatus(skill.id);
+                
+                let lineClass = 'connection-line';
+                if (prereqStatus === 'unlocked' && skillStatus !== 'locked') {
+                    lineClass += ' unlocked';
+                } else if (prereqStatus === 'unlocked' && skillStatus === 'current') {
+                    lineClass += ' current';
+                }
+                
+                // 创建连接线组（包含线和箭头）
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('class', 'connection-group');
+                group.dataset.prereqId = prereqId;
+                group.dataset.skillId = skill.id;
+                
+                // 计算箭头位置
+                const angle = Math.atan2(y2 - y1, x2 - x1);
+                const arrowLength = 15;
+                const arrowX = x2 - Math.cos(angle) * (prereqRect.width / 2 + 10);
+                const arrowY = y2 - Math.sin(angle) * (prereqRect.height / 2 + 10);
+                
+                // 调整线条终点，避免与节点重叠
+                const lineEndX = x2 - Math.cos(angle) * (prereqRect.width / 2 + 5);
+                const lineEndY = y2 - Math.sin(angle) * (prereqRect.height / 2 + 5);
+                
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', x1);
                 line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
-                line.setAttribute('class', `connection-line ${skillManager.getSkillStatus(prereqId) === 'unlocked' ? 'unlocked' : ''}`);
+                line.setAttribute('x2', lineEndX);
+                line.setAttribute('y2', lineEndY);
+                line.setAttribute('class', lineClass);
                 
-                connections.appendChild(line);
+                // 创建箭头
+                const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                const arrowPoints = [
+                    [arrowX, arrowY],
+                    [arrowX - arrowLength * Math.cos(angle - Math.PI / 6), arrowY - arrowLength * Math.sin(angle - Math.PI / 6)],
+                    [arrowX - arrowLength * Math.cos(angle + Math.PI / 6), arrowY - arrowLength * Math.sin(angle + Math.PI / 6)]
+                ];
+                arrow.setAttribute('points', arrowPoints.map(p => p.join(',')).join(' '));
+                arrow.setAttribute('class', `connection-arrow ${lineClass.replace('connection-line ', '')}`);
+                
+                group.appendChild(line);
+                group.appendChild(arrow);
+                connections.appendChild(group);
+                
+                // 添加悬停交互
+                group.addEventListener('mouseenter', () => highlightConnection(prereqId, skill.id));
+                group.addEventListener('mouseleave', () => unhighlightConnection());
             }
         });
+    });
+}
+
+function highlightConnection(prereqId, skillId) {
+    const prereqNode = document.querySelector(`[data-id="${prereqId}"]`);
+    const skillNode = document.querySelector(`[data-id="${skillId}"]`);
+    
+    if (prereqNode) {
+        prereqNode.style.transform = 'scale(1.1)';
+        prereqNode.style.zIndex = '10';
+        prereqNode.style.boxShadow = '0 0 30px rgba(0, 217, 255, 0.8)';
+    }
+    
+    if (skillNode) {
+        skillNode.style.transform = 'scale(1.1)';
+        skillNode.style.zIndex = '10';
+        skillNode.style.boxShadow = '0 0 30px rgba(0, 255, 136, 0.8)';
+    }
+    
+    // 高亮相关连接线
+    document.querySelectorAll('.connection-group').forEach(group => {
+        const isRelated = group.dataset.prereqId === prereqId ||
+                         group.dataset.skillId === prereqId ||
+                         group.dataset.prereqId === skillId ||
+                         group.dataset.skillId === skillId;
+        
+        if (isRelated) {
+            group.style.opacity = '1';
+            group.style.filter = 'brightness(1.5)';
+        } else {
+            group.style.opacity = '0.2';
+        }
+    });
+}
+
+function unhighlightConnection() {
+    document.querySelectorAll('.skill-node').forEach(node => {
+        node.style.transform = '';
+        node.style.zIndex = '';
+        node.style.boxShadow = '';
+    });
+    
+    document.querySelectorAll('.connection-group').forEach(group => {
+        group.style.opacity = '';
+        group.style.filter = '';
     });
 }
 
