@@ -1,11 +1,21 @@
 const skillManager = new SkillManager();
 let currentFilter = 'all';
-let currentView = 'grid';
+let currentView = window.innerWidth <= 768 ? 'list' : 'grid';
 
 function init() {
+    updateViewButtons();
     renderSkills();
     updateStats();
     setupEventListeners();
+}
+
+function updateViewButtons() {
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.view === currentView) {
+            btn.classList.add('active');
+        }
+    });
 }
 
 function renderSkills() {
