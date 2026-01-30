@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技能解锁地图</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 技能解锁地图</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">已解锁</span>
+                    <span class="stat-value" id="unlockedCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">总技能</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">进度</span>
+                    <span class="stat-value" id="progressPercent">0%</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="resetBtn">重置进度</button>
+            <button class="btn btn-secondary" id="addSkillBtn">添加技能</button>
+        </div>
+
+        <div class="skill-map" id="skillMap">
+            <svg id="connections"></svg>
+            <div id="skillsContainer"></div>
+        </div>
+
+        <div class="modal" id="skillModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">技能详情</h2>
+                <div id="modalBody"></div>
+            </div>
+        </div>
+
+        <div class="modal" id="addSkillModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>添加新技能</h2>
+                <form id="addSkillForm">
+                    <div class="form-group">
+                        <label for="skillName">技能名称</label>
+                        <input type="text" id="skillName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="skillDescription">技能描述</label>
+                        <textarea id="skillDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="skillCategory">技能分类</label>
+                        <select id="skillCategory">
+                            <option value="frontend">前端开发</option>
+                            <option value="backend">后端开发</option>
+                            <option value="database">数据库</option>
+                            <option value="devops">运维</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="skillPrerequisites">前置技能（用逗号分隔）</label>
+                        <input type="text" id="skillPrerequisites" placeholder="例如：HTML, CSS">
+                    </div>
+                    <button type="submit" class="btn btn-primary">添加技能</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="skills.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

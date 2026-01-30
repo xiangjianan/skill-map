@@ -1,0 +1,395 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, #00d9ff, #00ff88);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00ff88;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #00d9ff, #00ff88);
+    color: #1a1a2e;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.skill-map {
+    position: relative;
+    min-height: 600px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#connections {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.connection-line {
+    stroke: #444;
+    stroke-width: 2;
+    fill: none;
+    transition: stroke 0.3s ease;
+}
+
+.connection-line.unlocked {
+    stroke: #00ff88;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 5px #00ff88);
+}
+
+#skillsContainer {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+
+.skill-node {
+    position: relative;
+    width: 180px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.skill-node:hover {
+    transform: translateY(-5px);
+    border-color: rgba(0, 217, 255, 0.5);
+}
+
+.skill-node.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.skill-node.locked:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.skill-node.unlocked {
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.skill-node.current {
+    border-color: #00d9ff;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(0, 217, 255, 0.6);
+    }
+}
+
+.skill-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.skill-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.skill-category {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.skill-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.skill-status.locked {
+    background: rgba(255, 255, 255, 0.1);
+    color: #888;
+}
+
+.skill-status.current {
+    background: rgba(0, 217, 255, 0.2);
+    color: #00d9ff;
+}
+
+.skill-status.unlocked {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #fff;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #00d9ff;
+}
+
+#modalBody {
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.skill-detail {
+    margin-bottom: 15px;
+}
+
+.skill-detail-label {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.skill-detail-value {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #00d9ff;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.unlock-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #00d9ff, #00ff88);
+    border: none;
+    border-radius: 10px;
+    color: #1a1a2e;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.unlock-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+}
+
+.unlock-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    .stats {
+        gap: 20px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .skill-node {
+        width: 150px;
+        padding: 15px;
+    }
+
+    .skill-icon {
+        font-size: 2.5rem;
+    }
+
+    .skill-name {
+        font-size: 1rem;
+    }
+}
