@@ -31,6 +31,14 @@ header {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.header-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
 header h1 {
     font-size: 2.5rem;
     margin-bottom: 20px;
@@ -307,34 +315,22 @@ header h1 {
 }
 
 .connection-legend {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(26, 26, 46, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 15px;
-    z-index: 10;
-    backdrop-filter: blur(10px);
-}
-
-.connection-legend h4 {
-    color: #00d9ff;
-    margin-bottom: 12px;
-    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-    font-size: 0.8rem;
-    color: #ccc;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #888;
 }
 
 .legend-line {
-    width: 40px;
+    width: 30px;
     height: 3px;
     border-radius: 2px;
 }
@@ -344,20 +340,20 @@ header h1 {
     background-image: repeating-linear-gradient(
         90deg,
         #444,
-        #444 4px,
-        transparent 4px,
-        transparent 8px
+        #444 3px,
+        transparent 3px,
+        transparent 6px
     );
 }
 
 .legend-line.unlocked {
     background: #00ff88;
-    box-shadow: 0 0 5px #00ff88;
+    box-shadow: 0 0 4px #00ff88;
 }
 
 .legend-line.current {
     background: #00d9ff;
-    box-shadow: 0 0 5px #00d9ff;
+    box-shadow: 0 0 4px #00d9ff;
 }
 
 .connection-group {
@@ -638,6 +634,17 @@ header h1 {
         margin-bottom: 15px;
     }
 
+    .header-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .connection-legend {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+
     .stats {
         gap: 15px;
     }
@@ -765,10 +772,6 @@ header h1 {
         font-size: 24px;
         right: 15px;
         top: 15px;
-    }
-
-    .connection-legend {
-        display: none !important;
     }
 }
 

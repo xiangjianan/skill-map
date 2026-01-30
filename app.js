@@ -98,19 +98,15 @@ function drawConnections() {
     const connections = document.getElementById('connections');
     const container = document.getElementById('skillsContainer');
     const skills = skillManager.getAllSkills();
-    const legend = document.getElementById('connectionLegend');
     
     const containerRect = container.getBoundingClientRect();
     
     connections.innerHTML = '';
     
-    // 只在网格视图且非移动端时显示连接线和图例
+    // 只在网格视图且非移动端时显示连接线
     if (currentView !== 'grid' || window.innerWidth <= 768) {
-        if (legend) legend.style.display = 'none';
         return;
     }
-    
-    if (legend) legend.style.display = 'block';
     
     skills.forEach(skill => {
         skill.prerequisites.forEach(prereqId => {

@@ -12,18 +12,34 @@
     <div class="container">
         <header>
             <h1>🎮 技能解锁地图</h1>
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-label">已解锁</span>
-                    <span class="stat-value" id="unlockedCount">0</span>
+            <div class="header-content">
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">已解锁</span>
+                        <span class="stat-value" id="unlockedCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">总技能</span>
+                        <span class="stat-value" id="totalCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">进度</span>
+                        <span class="stat-value" id="progressPercent">0%</span>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">总技能</span>
-                    <span class="stat-value" id="totalCount">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">进度</span>
-                    <span class="stat-value" id="progressPercent">0%</span>
+                <div class="connection-legend" id="connectionLegend">
+                    <div class="legend-item">
+                        <div class="legend-line locked"></div>
+                        <span>未解锁</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line current"></div>
+                        <span>可解锁</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line unlocked"></div>
+                        <span>已解锁</span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -48,21 +64,6 @@
         </div>
 
         <div class="skill-map" id="skillMap">
-            <div class="connection-legend" id="connectionLegend">
-                <h4>🔗 连接说明</h4>
-                <div class="legend-item">
-                    <div class="legend-line locked"></div>
-                    <span>未解锁路径</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line current"></div>
-                    <span>可解锁路径</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line unlocked"></div>
-                    <span>已解锁路径</span>
-                </div>
-            </div>
             <svg id="connections"></svg>
             <div id="skillsContainer"></div>
         </div>
