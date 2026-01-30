@@ -1,4 +1,6 @@
 const skillManager = new SkillManager();
+let currentFilter = 'all';
+let currentView = 'grid';
 
 function init() {
     renderSkills();
@@ -13,16 +15,27 @@ function renderSkills() {
     container.innerHTML = '';
     connections.innerHTML = '';
     
-    const skills = skillManager.getAllSkills();
+    if (currentView === 'list') {
+        container.classList.add('list-view');
+    } else {
+        container.classList.remove('list-view');
+    }
     
-    skills.forEach(skill => {
+    const skills = skillManager.getAllSkills();
+    const filteredSkills = currentFilter === 'all' 
+        ? skills 
+        : skills.filter(skill => skill.category === currentFilter);
+    
+    filteredSkills.forEach(skill => {
         const skillNode = createSkillNode(skill);
         container.appendChild(skillNode);
     });
     
-    setTimeout(() => {
-        drawConnections();
-    }, 100);
+    if (currentView === 'grid') {
+        setTimeout(() => {
+            drawConnections();
+        }, 100);
+    }
 }
 
 function createSkillNode(skill) {
@@ -37,12 +50,23 @@ function createSkillNode(skill) {
         'unlocked': '✅ 已解锁'
     };
     
-    node.innerHTML = `
-        <div class="skill-icon">${skill.icon}</div>
-        <div class="skill-name">${skill.name}</div>
-        <div class="skill-category">${getCategoryName(skill.category)}</div>
-        <div class="skill-status ${status}">${statusText[status]}</div>
-    `;
+    if (currentView === 'list') {
+        node.innerHTML = `
+            <div class="skill-icon">${skill.icon}</div>
+            <div class="skill-info">
+                <div class="skill-name">${skill.name}</div>
+                <div class="skill-category">${getCategoryName(skill.category)}</div>
+            </div>
+            <div class="skill-status ${status}">${statusText[status]}</div>
+        `;
+    } else {
+        node.innerHTML = `
+            <div class="skill-icon">${skill.icon}</div>
+            <div class="skill-name">${skill.name}</div>
+            <div class="skill-category">${getCategoryName(skill.category)}</div>
+            <div class="skill-status ${status}">${statusText[status]}</div>
+        `;
+    }
     
     node.addEventListener('click', () => showSkillDetail(skill));
     
@@ -167,6 +191,24 @@ function setupEventListeners() {
         document.getElementById('addSkillModal').classList.add('show');
     });
     
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderSkills();
+        });
+    });
+    
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentView = btn.dataset.view;
+            renderSkills();
+        });
+    });
+    
     document.querySelectorAll('.close').forEach(closeBtn => {
         closeBtn.addEventListener('click', (e) => {
             const modal = e.target.closest('.modal');
@@ -180,6 +222,8 @@ function setupEventListeners() {
                 modal.classList.remove('show');
             }
         });
+        
+        setupSwipeToClose(modal);
     });
     
     document.getElementById('addSkillForm').addEventListener('submit', (e) => {
@@ -190,6 +234,40 @@ function setupEventListeners() {
     window.addEventListener('resize', () => {
         drawConnections();
     });
+    
+    document.addEventListener('touchstart', () => {}, { passive: true });
+}
+
+function setupSwipeToClose(modal) {
+    let startY = 0;
+    let currentY = 0;
+    const content = modal.querySelector('.modal-content');
+    
+    modal.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        currentY = startY;
+    }, { passive: true });
+    
+    modal.addEventListener('touchmove', (e) => {
+        currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+        
+        if (diff > 0) {
+            content.style.transform = `translateY(${diff}px)`;
+            content.style.opacity = 1 - (diff / 300);
+        }
+    }, { passive: true });
+    
+    modal.addEventListener('touchend', () => {
+        const diff = currentY - startY;
+        
+        if (diff > 100) {
+            modal.classList.remove('show');
+        }
+        
+        content.style.transform = '';
+        content.style.opacity = '';
+    }, { passive: true });
 }
 
 function addNewSkill() {
@@ -240,28 +318,32 @@ function closeModal(modalId) {
 }
 
 function showNotification(message) {
+    const isMobile = window.innerWidth <= 768;
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
-        top: 20px;
-        right: 20px;
+        ${isMobile ? 'top: auto; bottom: 20px; left: 50%; transform: translateX(-50%);' : 'top: 20px; right: 20px;'}
         background: linear-gradient(135deg, #00d9ff, #00ff88);
         color: #1a1a2e;
-        padding: 15px 25px;
+        padding: ${isMobile ? '12px 20px' : '15px 25px'};
         border-radius: 10px;
         font-weight: 600;
         z-index: 2000;
-        animation: slideIn 0.3s ease;
+        animation: ${isMobile ? 'slideUp' : 'slideIn'} 0.3s ease;
         box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+        max-width: ${isMobile ? '90vw' : 'auto'};
+        text-align: center;
     `;
     notification.textContent = message;
     
     document.body.appendChild(notification);
     
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
+        notification.style.animation = isMobile ? 'slideDown 0.3s ease' : 'slideOut 0.3s ease';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
         }, 300);
     }, 3000);
 }
@@ -286,6 +368,28 @@ style.textContent = `
         }
         to {
             transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes slideUp {
+        from {
+            transform: translate(-50%, 100px);
+            opacity: 0;
+        }
+        to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideDown {
+        from {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+        to {
+            transform: translate(-50%, 100px);
             opacity: 0;
         }
     }
