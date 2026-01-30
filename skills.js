@@ -259,7 +259,9 @@ class SkillManager {
     }
 
     reset() {
-        this.skills = JSON.parse(JSON.stringify(defaultSkills));
+        this.skills.forEach(skill => {
+            skill.unlocked = false;
+        });
         this.saveSkills();
     }
 
