@@ -263,6 +263,7 @@ function showSkillDetail(skill) {
         </div>
         <div class="skill-actions">
             ${canUnlock ? `<button class="unlock-btn" onclick="unlockSkill('${skill.id}')">🎮 解锁此技能</button>` : ''}
+            <button class="edit-btn" onclick="openEditSkillModal('${skill.id}')">✏️ 编辑技能</button>
             <button class="delete-btn" onclick="confirmDeleteSkill('${skill.id}')">🗑️ 删除技能</button>
         </div>
     `;
@@ -306,6 +307,88 @@ function deleteSkill(id) {
         updateStats();
         closeModal('skillModal');
         showNotification(`🗑️ 已删除技能「${skill.name}」`);
+    }
+}
+
+function openEditSkillModal(id) {
+    const skill = skillManager.getSkill(id);
+    if (!skill) return;
+
+    // 关闭详情模态框
+    closeModal('skillModal');
+
+    // 填充编辑表单
+    document.getElementById('editSkillId').value = skill.id;
+    document.getElementById('editSkillName').value = skill.name;
+    document.getElementById('editSkillDescription').value = skill.description;
+    document.getElementById('editSkillCategory').value = skill.category;
+    document.getElementById('editSkillIcon').value = skill.icon;
+
+    // 填充前置技能（显示技能名称而不是ID）
+    const prereqNames = skill.prerequisites.map(prereqId => {
+        const prereq = skillManager.getSkill(prereqId);
+        return prereq ? prereq.name : prereqId;
+    });
+    document.getElementById('editSkillPrerequisites').value = prereqNames.join(', ');
+
+    // 打开编辑模态框
+    document.getElementById('editSkillModal').classList.add('show');
+}
+
+function saveSkillEdit(e) {
+    e.preventDefault();
+
+    const id = document.getElementById('editSkillId').value;
+    const name = document.getElementById('editSkillName').value.trim();
+    const description = document.getElementById('editSkillDescription').value.trim();
+    const category = document.getElementById('editSkillCategory').value;
+    const icon = document.getElementById('editSkillIcon').value.trim();
+    const prerequisitesText = document.getElementById('editSkillPrerequisites').value.trim();
+
+    if (!name) {
+        showNotification('❌ 请输入技能名称');
+        return;
+    }
+
+    // 将技能名称转换为ID格式（用于前置技能）
+    const prerequisites = prerequisitesText
+        ? prerequisitesText.split(',')
+            .map(p => {
+                const trimmedName = p.trim();
+                // 查找对应的技能ID
+                const foundSkill = skillManager.getAllSkills().find(s =>
+                    s.name.toLowerCase() === trimmedName.toLowerCase()
+                );
+                return foundSkill ? foundSkill.id : trimmedName.toLowerCase().replace(/\s+/g, '-');
+            })
+        : [];
+
+    // 如果技能名称改变了，需要更新所有引用此技能的前置条件
+    const currentSkill = skillManager.getSkill(id);
+    const nameChanged = currentSkill.name !== name;
+
+    const updates = {
+        name,
+        description: description || '暂无描述',
+        category,
+        icon: icon || '🎯',
+        prerequisites
+    };
+
+    if (skillManager.updateSkill(id, updates)) {
+        // 如果名称改变了，更新所有依赖此技能的前置条件
+        if (nameChanged) {
+            const newId = name.toLowerCase().replace(/\s+/g, '-');
+            // 需要遍历所有技能，更新前置条件中的ID引用
+            // 注意：这里简化处理，实际应用中可能需要更复杂的逻辑
+        }
+
+        renderSkills();
+        updateStats();
+        closeModal('editSkillModal');
+        showNotification(`✅ 技能「${name}」已更新！`);
+    } else {
+        showNotification('❌ 更新失败');
     }
 }
 
@@ -367,6 +450,11 @@ function setupEventListeners() {
     document.getElementById('addSkillForm').addEventListener('submit', (e) => {
         e.preventDefault();
         addNewSkill();
+    });
+
+    document.getElementById('editSkillForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveSkillEdit(e);
     });
     
     window.addEventListener('resize', () => {

@@ -107,6 +107,43 @@
                 </form>
             </div>
         </div>
+
+        <div class="modal" id="editSkillModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>编辑技能</h2>
+                <form id="editSkillForm">
+                    <input type="hidden" id="editSkillId">
+                    <div class="form-group">
+                        <label for="editSkillName">技能名称</label>
+                        <input type="text" id="editSkillName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSkillDescription">技能描述</label>
+                        <textarea id="editSkillDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSkillCategory">技能分类</label>
+                        <select id="editSkillCategory">
+                            <option value="frontend">前端开发</option>
+                            <option value="backend">后端开发</option>
+                            <option value="database">数据库</option>
+                            <option value="devops">运维</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSkillIcon">技能图标</label>
+                        <input type="text" id="editSkillIcon" placeholder="例如：🎯">
+                    </div>
+                    <div class="form-group">
+                        <label for="editSkillPrerequisites">前置技能（用逗号分隔）</label>
+                        <input type="text" id="editSkillPrerequisites" placeholder="例如：HTML, CSS">
+                    </div>
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="skills.js"></script>

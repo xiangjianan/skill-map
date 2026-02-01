@@ -227,6 +227,32 @@ class SkillManager {
         return false;
     }
 
+    updateSkill(id, updates) {
+        const skill = this.getSkill(id);
+        if (!skill) return false;
+
+        // 更新技能属性
+        Object.assign(skill, updates);
+
+        // 如果修改了前置条件，需要检查所有技能的引用
+        if (updates.prerequisites) {
+            // 移除旧的前置条件（从其他技能的 prerequisites 中）
+            const oldPrerequisites = skill.prerequisites;
+            oldPrerequisites.forEach(prereqId => {
+                if (!updates.prerequisites.includes(prereqId)) {
+                    this.skills.forEach(s => {
+                        if (s.id === prereqId) {
+                            // 不需要从其他技能移除引用，只是这个技能不再依赖它
+                        }
+                    });
+                }
+            });
+        }
+
+        this.saveSkills();
+        return true;
+    }
+
     unlockSkill(id) {
         const skill = this.getSkill(id);
         if (skill && this.canUnlock(id)) {
