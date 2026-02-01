@@ -261,7 +261,10 @@ function showSkillDetail(skill) {
             <div class="skill-detail-label">当前状态</div>
             <div class="skill-detail-value">${status === 'unlocked' ? '✅ 已解锁' : status === 'current' ? '🎯 可解锁' : '🔒 未解锁'}</div>
         </div>
-        ${canUnlock ? `<button class="unlock-btn" onclick="unlockSkill('${skill.id}')">🎮 解锁此技能</button>` : ''}
+        <div class="skill-actions">
+            ${canUnlock ? `<button class="unlock-btn" onclick="unlockSkill('${skill.id}')">🎮 解锁此技能</button>` : ''}
+            <button class="delete-btn" onclick="confirmDeleteSkill('${skill.id}')">🗑️ 删除技能</button>
+        </div>
     `;
     
     modal.classList.add('show');
@@ -273,6 +276,36 @@ function unlockSkill(id) {
         updateStats();
         closeModal('skillModal');
         showNotification(`🎉 恭喜！你已解锁 ${skillManager.getSkill(id).name}！`);
+    }
+}
+
+function confirmDeleteSkill(id) {
+    const skill = skillManager.getSkill(id);
+    if (!skill) return;
+    
+    // 检查是否有其他技能依赖此技能
+    const dependentSkills = skillManager.getAllSkills().filter(s =>
+        s.prerequisites.includes(id)
+    );
+    
+    let confirmMessage = `确定要删除技能「${skill.name}」吗？`;
+    if (dependentSkills.length > 0) {
+        const dependentNames = dependentSkills.map(s => s.name).join('、');
+        confirmMessage += `\n\n注意：以下技能的前置条件将移除此技能：\n${dependentNames}`;
+    }
+    
+    if (confirm(confirmMessage)) {
+        deleteSkill(id);
+    }
+}
+
+function deleteSkill(id) {
+    const skill = skillManager.getSkill(id);
+    if (skillManager.deleteSkill(id)) {
+        renderSkills();
+        updateStats();
+        closeModal('skillModal');
+        showNotification(`🗑️ 已删除技能「${skill.name}」`);
     }
 }
 

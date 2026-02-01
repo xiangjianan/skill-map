@@ -211,6 +211,22 @@ class SkillManager {
         this.saveSkills();
     }
 
+    deleteSkill(id) {
+        // 从其他技能的前置条件中移除该技能
+        this.skills.forEach(skill => {
+            skill.prerequisites = skill.prerequisites.filter(prereqId => prereqId !== id);
+        });
+        
+        // 删除技能
+        const index = this.skills.findIndex(skill => skill.id === id);
+        if (index !== -1) {
+            this.skills.splice(index, 1);
+            this.saveSkills();
+            return true;
+        }
+        return false;
+    }
+
     unlockSkill(id) {
         const skill = this.getSkill(id);
         if (skill && this.canUnlock(id)) {
